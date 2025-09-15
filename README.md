@@ -4,52 +4,6 @@ Goal. Adapt and evaluate a Text-to-SQL pipeline for logistics (pickup & delivery
 
 This repository contains my research code, configs, and docs for building a logistics-focused Text-to-SQL system powered by a RAG (Retrieval-Augmented Generation) pipeline and evaluated on tasks grounded in the Cainiao LaDe last-mile delivery dataset. The project uses the open-source Datrics Text2SQL pipeline as the generation backbone and adds domain-specific canonicalization, sanitization, and evaluation layers.
 
-Dataset reference: Cainiao LaDe (Last-mile Delivery) dataset. 
-GitHub
-+2
-arXiv
-+2
-
-Pipeline reference: Datrics Text2SQL (RAG-centric Text-to-SQL engine). 
-GitHub
-+2
-GitHub
-+2
-
-Table of Contents
-
-Features
-
-Architecture
-
-Getting Started
-
-Prerequisites
-
-Installation
-
-Quickstart
-
-Configuration
-
-Data Setup
-
-Evaluation
-
-Canonical SQL Style
-
-Project Structure
-
-Results & Reproducibility
-
-Roadmap
-
-Acknowledgements & References
-
-License
-
-Features
-
 RAG-powered Text-to-SQL built on top of the Datrics Text2SQL engine (Streamlit app optional). You can swap between local and hosted LLMs.
 
 Logistics domain focus using pickup and delivery tables with real last-mile analytics questions.
