@@ -8,3 +8,4 @@ vector_db_storage
 run
 data/processed
 data/raw
+dvdrental.tar
