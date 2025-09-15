@@ -1,0 +1,34 @@
+- **Scope**
+    - All example, training, and gold sets are crafted using the same rules.
+- **Schema & Aliases**
+    - Always qualify: `public.pickup p`, `public.delivery d`.
+    - Use only `p` for pickup and `d` for delivery (no other aliases).
+- **Style & Casing**
+    - SQL keywords in **UPPERCASE**.
+    - Identifiers in **lower_snake_case**.
+- **COUNT / Aggregates**
+    - Use `COUNT(*)` (not `COUNT(1)` or `COUNT(order_id)`), unless intentionally using a subset: `COUNT(DISTINCT …)`.
+    - Cast averages as `AVG(...)::float` (cast **after** the closing `)`).
+    - Duration math uses a float divisor: `… / 3600.0` (never `/ 3600` or `3600.0.0`).
+    - Do **not** put `::float` inside `EXTRACT(...)`.
+- **Time & Date Handling**
+    - Day bucket: `date_trunc('day', ts) AS day` — ensure **exactly one** `AS day` (avoid artifacts like `day::date AS day` or duplicate aliases).
+    - Hour-of-day: `EXTRACT(HOUR FROM ts) AS hour_of_day`.
+    - Durations (hours): `EXTRACT(EPOCH FROM (end_ts - start_ts)) / 3600.0`.
+    - Delivery validity (when comparing/deriving from delivery timestamps):  
+        `WHERE d.timestamp_utc >= d.accept_ts_utc` (no contradictory `<` clause).
+- **Ordering & Limits**
+    - For “top/worst single” results, enforce `LIMIT 1`.
+    - When `ORDER BY` is present and determinism matters (especially with `LIMIT 1`), include a **meaningful** secondary tie-breaker:
+        - Prefer the table’s primary/discriminative key: `p.order_id` or `d.order_id`.
+        - If ordering by `day`, prefer `hour_of_day` (if present) or `timestamp_utc`.
+        - Only fall back to `city ASC` when it genuinely disambiguates.
+    - Tie-breakers must appear **inside** the `ORDER BY` list; never after the semicolon. No stray commas before `;`.
+- **Joins & Structure**
+    - Always explicit `JOIN … ON …` when both tables appear (no implicit/comma joins).
+    - CTEs use short, semantic names.
+- **Null & Unanswerable**
+    - Use `gold_sql: null` for truly unanswerable questions (don’t fabricate).
+- **Formatting Hygiene**
+    - Normalize spaces to regular ASCII spaces (avoid hidden non-breaking spaces).
+    - No trailing commas before semicolons; one statement terminator `;` only.

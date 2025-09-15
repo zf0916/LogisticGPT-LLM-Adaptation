@@ -1,0 +1,124 @@
+{
+  "router_model_list": [
+    {
+      "model_name": "sqlcoder-7b-2",
+      "litellm_params": {
+        "model": "ollama/pxlksr/defog_sqlcoder-7b-2:Q8",
+        "api_base": "http://localhost:11434",
+        "api_key": "ollama",
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 1024,
+        "timeout": 25
+      }
+    },
+    {
+      "model_name": "mistral-local",
+      "litellm_params": {
+        "model": "ollama/mistral:7b-instruct-q8_0",
+        "api_base": "http://localhost:11434",
+        "api_key": "ollama",
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 512,
+        "timeout": 25
+      }
+    },
+    {
+      "model_name": "llama3.1-local",
+      "litellm_params": {
+        "model": "ollama/llama3.1:8b-instruct-q8_0",
+        "api_base": "http://localhost:11434",
+        "api_key": "ollama",
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 1024,
+        "timeout": 25,
+        "drop_params": true
+      }
+    },
+    {
+      "model_name": "gpt-4o-mini",
+      "litellm_params": {
+        "model": "gpt-4o-mini",
+        "api_key": "${OPENAI_API_KEY}",
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 512,
+        "timeout": 25
+      }
+    },
+    {
+      "model_name": "gpt-4o",
+      "litellm_params": {
+        "model": "gpt-4o",
+        "api_key": "${OPENAI_API_KEY}",
+        "temperature": 0,
+        "top_p": 1,
+        "max_tokens": 512,
+        "timeout": 40
+      }
+    }
+  ],
+  "open_ai_key": "${OPENAI_API_KEY}",
+  "model_sql": "sqlcoder-7b-2",
+  "model_table_selection": "llama3.1-local",
+  "model_supports_reasoning": true,
+  "descriptors_path": "descriptors/default",
+  "docs_md_folder": "training_data_storage/md_docs",
+  "docs_json_folder": "training_data_storage/json_docs",
+  "examples_folder": "training_data_storage/examples",
+  "examples_extended_folder": "training_data_storage/train_examples",
+  "docs_ddl_folder": "training_data_storage/ddl_docs",
+  "router_default_max_parallel_requests": 20,
+  "router_default_num_retries": 3,
+  "db_path": "vector_db_storage/chroma_gte",
+  "embedding_backend": "local",
+  "embedding_model": "Alibaba-NLP/gte-base-en-v1.5",
+  "hf_trust_remote_code": true,
+  "collection_metadata": {
+    "hnsw:space": "cosine"
+  },
+  "n_results_sql": 15,
+  "client": "persistent",
+  "business_rules": [
+    "Cycle time means pickup timestamp to delivery completion timestamp.",
+    "Delivery time means delivery acceptance timestamp to delivery completion timestamp.",
+    "Ignore deliveries where completion happens before acceptance.",
+    "Ignore deliveries where completion happens before pickup.",
+    "When ranking cities, couriers, or regions, only consider groups with at least 30 events.",
+    "Break ties deterministically: sort by the metric, then alphabetically by the group key, then by earliest date.",
+    "Average per day means compute daily counts first, then average those daily counts.",
+    "Late pickup means pickup happened after the promised window end; only count if a window end exists.",
+    "Report all durations in hours (decimal hours).",
+    "Percentages are shares of the total within the same scope and should sum to ~100%.",
+    "Pickup-only orders are pickups that never became deliveries (treat as 'pickup with no matching delivery').",
+    "Chronology violations include both: delivery before acceptance and delivery before pickup.",
+    "For a single best or worst result, return exactly one row using the tie rule.",
+    "Return the identifying keys that the question implies (e.g., city, courier, date) along with the metric.",
+    "Exclude records with missing or null timestamps needed for the metric.",
+    "Use calendar day (UTC) when the question refers to 'per day' unless stated otherwise."],
+  "prompts": {
+    "DEFAULT_SQL_INSTRUCTIONS": "Mandatory - use these in your chain-of-thought and final SQL.\n1. If public.pickup or public.delivery are used, alias them as p and d.\n2. Read-only queries (SELECT/CTE only).\n3. Prefer the smallest number of joins needed.\n4. Compute durations as 'hours' (end - start).\n5. Return the keys the question implies (e.g., city/courier/date) with the metric.\n6. If selecting a single best/worst, sort deterministically and LIMIT 1.\n7. Exclude clearly invalid/missing timestamps before aggregation."
+  },
+  "db": {
+    "source": "postgres",
+    "connection_config": {
+      "schema": "public",
+      "password": "postgres",
+      "host": "localhost",
+      "database": "t2sql_db",
+      "user": "postgres",
+      "port": 5433
+    }
+  },
+  "quiet_sql_errors": true,
+  "max_sql_fix_attempts": 1,
+  "sql_exec_timeout_s": 90,
+  "sql_autofix_enabled": true,
+  "sql_autofix_blacklist": [
+    "undefined_column",
+    "undefined_table"
+  ],
+  "descriptors_folder": "descriptors\\default"
+}
